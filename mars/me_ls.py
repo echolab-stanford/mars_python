@@ -36,11 +36,11 @@ def _create_meat_matrix(
     X : np.ndarray
         Design matrix
     Y : np.ndarray  
-        Outcome vector
+        Outcome vector or matrix
     Sigma : np.ndarray or List[np.ndarray]
         Measurement error covariance (single matrix for iid, list for inid)
     beta_hat : np.ndarray
-        Parameter estimates
+        Parameter estimates (K x p matrix for p outcomes)
     is_inid : bool
         Whether this is the inid (heteroskedastic) case
         
@@ -50,6 +50,14 @@ def _create_meat_matrix(
         Meat matrix for sandwich estimator
     """
     K = X.shape[1]
+    
+    # Handle multiple outcomes
+    if Y.ndim == 1:
+        Y = Y.reshape(-1, 1)
+    if beta_hat.ndim == 1:
+        beta_hat = beta_hat.reshape(-1, 1)
+        
+    p = Y.shape[1]  # Number of outcomes
     meat = np.zeros((K, K))
     clusters = np.unique(cluster)
     
@@ -63,19 +71,21 @@ def _create_meat_matrix(
         moment = np.zeros((K, 1))
         
         for i, idx in enumerate(np.where(indices)[0]):
-            # Residual for observation i in cluster g
-            residual = Y_g[i] - X_g[i] @ beta_hat
-            
-            # Measurement error adjustment
-            if is_inid:
-                # Individual-specific Sigma matrix
-                me_adjustment = Sigma[idx] @ beta_hat
-            else:
-                # Common Sigma matrix  
-                me_adjustment = Sigma @ beta_hat
-            
-            # Add to cluster moment
-            moment += (X_g[i:i+1].T * residual + me_adjustment.reshape(-1, 1))
+            # For multiple outcomes, we need to sum over outcomes
+            for j in range(p):
+                # Residual for observation i in cluster g, outcome j
+                residual = Y_g[i, j] - X_g[i] @ beta_hat[:, j]
+                
+                # Measurement error adjustment
+                if is_inid:
+                    # Individual-specific Sigma matrix
+                    me_adjustment = Sigma[idx] @ beta_hat[:, j]
+                else:
+                    # Common Sigma matrix  
+                    me_adjustment = Sigma @ beta_hat[:, j]
+                
+                # Add to cluster moment
+                moment += (X_g[i:i+1].T * residual + me_adjustment.reshape(-1, 1))
         
         # Add outer product to meat matrix
         meat += moment @ moment.T
@@ -188,6 +198,12 @@ def me_ls_iid(
     # Compute point estimates with measurement error correction
     try:
         XTX_corrected = X.T @ X - n * Sigma
+        
+        # Check for singularity by computing condition number
+        cond_num = np.linalg.cond(XTX_corrected)
+        if cond_num > 1e15:  # Effectively singular
+            raise ValueError("Singular matrix after measurement error correction")
+            
         XTY = X.T @ Y
         beta_hat = linalg.solve(XTX_corrected, XTY)
     except linalg.LinAlgError:

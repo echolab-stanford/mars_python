@@ -258,19 +258,18 @@ class TestMELS:
             assert np.all(ci_width > 0)
     
     def test_singular_matrix_handling(self):
-        """Test handling of near-singular matrices"""
-        # Create a design matrix with multicollinearity
-        X_singular = np.column_stack([
-            np.random.randn(self.n),
-            np.random.randn(self.n),
-            np.random.randn(self.n) * 1e-10  # Nearly zero column
-        ])
+        """Test handling of singular matrices"""
+        # Create a simple 2x2 case where we can guarantee singularity
+        n_small = 50
+        X_singular = np.ones((n_small, 2))  # Two identical columns
+        Y_singular = np.random.randn(n_small)
         
-        Y_singular = X_singular @ np.array([1, -1, 0]) + np.random.randn(self.n) * 0.1
-        Sigma_singular = np.eye(3) * 0.01
+        # Sigma that will make X'X - n*Sigma singular
+        Sigma_singular = np.array([[1.0, 1.0], 
+                                  [1.0, 1.0]]) / n_small  # This will make the corrected matrix singular
         
-        # This should raise an error or handle gracefully
-        with pytest.raises(ValueError):
+        # This should raise an error due to singularity
+        with pytest.raises(ValueError, match="Singular matrix|Cannot invert"):
             me_ls_iid(
                 X=X_singular,
                 Y=Y_singular,

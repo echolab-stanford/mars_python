@@ -83,11 +83,14 @@ def mars_mean_estimator(
     # Compute pseudo-outcomes using influence function
     pseudo = hat_mu + (A / pi) * (M - hat_mu)
     
-    # Point estimate (scaled)
-    hat_theta = np.mean(pseudo) * scale
+    # Point estimate (unscaled)
+    hat_theta_unscaled = np.mean(pseudo)
     
-    # Compute asymptotic variance
-    psi = pseudo - hat_theta
+    # Point estimate (scaled)
+    hat_theta = hat_theta_unscaled * scale
+    
+    # Compute asymptotic variance (using unscaled estimate)
+    psi = pseudo - hat_theta_unscaled
     avar = np.mean(psi**2) * (scale**2)
     
     # Standard error
