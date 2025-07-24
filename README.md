@@ -4,7 +4,7 @@
 
 **MARS: A Unifying Framework for Robust and Efficient Inference with Unstructured Data**
 
-This is a Python implementation of the MARS statistical framework, translated from the original R package. MARS provides robust estimators for statistical inference when you have:
+This is a Python implementation of the MARS statistical framework, translated from the [original R package](https://github.com/jscarlson/mar-s). MARS provides robust estimators for statistical inference when you have:
 
 - **Ground truth labels** for only a subset of your data (annotation indicators `A`)
 - **Machine learning predictions** (`hat_mu`) for the entire dataset  
@@ -117,16 +117,6 @@ result = me_ls_iid(
 )
 ```
 
-## Key Differences from Standard Methods
-
-| Method | Standard Approach | MARS Approach |
-|--------|------------------|---------------|
-| **Mean Estimation** | Sample average | Pseudo-outcome average with annotation weighting |
-| **Regression** | OLS on full sample | Residualized covariates with pseudo-outcomes |
-| **IV Estimation** | 2SLS | IV with measurement-error corrected treatment |
-| **DiD** | Simple differences | Callaway-Sant'Anna with pseudo-outcomes |
-| **RDD** | Local linear regression | Local estimation with pseudo-outcomes |
-
 ## Testing
 
 Run the test suite:
@@ -142,50 +132,10 @@ Run examples:
 python examples/basic_usage.py
 ```
 
-## Dependencies
-
-- `numpy >= 1.20.0`: Matrix operations and numerical computing
-- `scipy >= 1.7.0`: Statistical distributions and linear algebra
-- `pandas >= 1.3.0`: Data handling and groupby operations
-- `statsmodels >= 0.12.0`: Statistical utilities
-- `tqdm`: Progress bars for long-running computations
-
-## Validation
-
-The Python implementation has been validated against the original R package through:
-
-1. **Unit tests** comparing outputs on identical simulated data
-2. **Mathematical verification** of influence function calculations  
-3. **Numerical stability tests** for edge cases and large datasets
-4. **Performance benchmarks** ensuring reasonable computational efficiency
-
-## Citation
-
 If you use this library, please cite the original paper:
 
-> Carlson, Jacob and Dell, Melissa. "A Unifying Framework for Robust and Efficient Inference with Unstructured Data." 2025.
+> Carlson, J., & Dell, M. (2025). A Unifying Framework for Robust and Efficient Inference with Unstructured Data (No. arXiv:2505.00282). arXiv. https://doi.org/10.48550/arXiv.2505.00282
 
-## Limitations and Notes
-
-### What Works Well
-- All core MARS estimators translate directly from R
-- Matrix operations use efficient NumPy implementations
-- Cluster-robust standard errors with one-way and two-way clustering
-- Numerical stability features (eigenvalue corrections, regularization)
-
-### Known Challenges
-- **Performance**: Cluster-robust standard errors can be slow for very large datasets with many clusters
-- **Memory**: Two-way clustering requires storing multiple meat matrices simultaneously
-- **Numerical**: Very high-dimensional measurement error corrections may need regularization
-
-### Not Implemented
+### Things left out from the R code
 - **LLM Integration**: The original R package's OpenAI/HuggingFace API wrappers are not included (by design)
 - **Specialized Plotting**: Advanced visualization functions from the R package
-
-## Contributing
-
-This is a research-focused translation of the original R package. For bug reports or feature requests, please ensure compatibility with the core statistical methodology of the original MARS framework.
-
-## License
-
-MIT License (same as original R package)
