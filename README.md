@@ -1,5 +1,7 @@
 # MARS Python Library
 
+[![Python package](https://github.com/echolab-stanford/mars_python/actions/workflows/python-package.yml/badge.svg)](https://github.com/echolab-stanford/mars_python/actions/workflows/python-package.yml)
+
 **MARS: A Unifying Framework for Robust and Efficient Inference with Unstructured Data**
 
 This is a Python implementation of the MARS statistical framework, translated from the original R package. MARS provides robust estimators for statistical inference when you have:
