@@ -66,14 +66,6 @@ Both support:
 - Eigenvalue corrections for numerical stability
 - Multiple outcome variables
 
-## Mathematical Framework
-
-The MARS framework addresses the challenge of statistical inference with partially annotated data. The key insight is to use **influence functions** to combine ML predictions with human annotations:
-
-1. **Pseudo-outcomes**: `ψ = ĥ + (A/π)(M - ĥ)`
-2. **Consistent estimation**: E[ψ] = E[Y] under mild conditions
-3. **Asymptotic variance**: Uses influence function approach for robust inference
-
 ## Example Applications
 
 ### 1. Population Mean Estimation
